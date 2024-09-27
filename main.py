@@ -1,9 +1,13 @@
+import os
 import tkinter as tk
 from tkinter import filedialog, messagebox
 import PyPDF2
 
 
 # Author: Kaan Nakipoğlu
+file_paths_list = []
+
+
 def merge_pdfs(pdf_list, output_filename):
     pdf_merger = PyPDF2.PdfMerger()
 
@@ -17,21 +21,26 @@ def merge_pdfs(pdf_list, output_filename):
 
 
 def select_files():
-    file_paths = filedialog.askopenfilenames(
+    global file_paths_list
+    selected_paths = filedialog.askopenfilenames(
         title="Select PDF Files",
         filetypes=[("PDF files", "*.pdf")],
         defaultextension=".pdf"
     )
-    if file_paths:
-        for path in file_paths:
-            file_listbox.insert(tk.END, path)
+    if selected_paths:
+        for path in selected_paths:
+            file_paths_list.append(path)  # Store the full path
+            file_listbox.insert(tk.END, os.path.basename(path))  # Show only the file name
 
 
 def merge_files():
-    pdfs_to_merge = file_listbox.get(0, tk.END)
-    if not pdfs_to_merge:
+    global file_paths_list
+    selected_indices = file_listbox.curselection()
+    if not selected_indices:
         messagebox.showerror("Error", "No PDF files selected.")
         return
+
+    pdfs_to_merge = [file_paths_list[i] for i in selected_indices]  # Get the full file paths
 
     output_path = filedialog.asksaveasfilename(
         defaultextension=".pdf",
@@ -41,22 +50,69 @@ def merge_files():
     if not output_path:
         return
 
-    merge_pdfs(list(pdfs_to_merge), output_path)
+    merge_pdfs(pdfs_to_merge, output_path)
 
 
 def remove_selected():
-    """Remove selected files from the listbox."""
+    global file_paths_list
     selected_files = file_listbox.curselection()
     for index in reversed(selected_files):
         file_listbox.delete(index)
+        del file_paths_list[index]  # Remove the corresponding full path
+
+
+def move_up():
+    global file_paths_list
+    selected_indices = file_listbox.curselection()
+    if not selected_indices:
+        return
+
+    for index in selected_indices:
+        if index == 0:  # If it's the first item, skip it
+            continue
+        file_listbox.delete(index)
+        file_listbox.insert(index - 1, os.path.basename(file_paths_list[index]))
+        file_listbox.selection_set(index - 1)
+
+        # Move the corresponding path in file_paths_list
+        file_paths_list[index], file_paths_list[index - 1] = file_paths_list[index - 1], file_paths_list[index]
+
+
+def move_down():
+    global file_paths_list
+    selected_indices = file_listbox.curselection()
+    if not selected_indices:
+        return
+
+    for index in reversed(selected_indices):
+        if index == file_listbox.size() - 1:  # If it's the last item, skip it
+            continue
+        file_listbox.delete(index)
+        file_listbox.insert(index + 1, os.path.basename(file_paths_list[index]))
+        file_listbox.selection_set(index + 1)
+
+        # Move the corresponding path in file_paths_list
+        file_paths_list[index], file_paths_list[index + 1] = file_paths_list[index + 1], file_paths_list[index]
 
 
 root = tk.Tk()
 root.title("PDF Merger")
-root.geometry("400x400")
+root.geometry("500x400")
 
-file_listbox = tk.Listbox(root, selectmode=tk.MULTIPLE, width=50, height=10)
-file_listbox.pack(pady=20)
+listbox_frame = tk.Frame(root)
+listbox_frame.pack(pady=20)
+
+file_listbox = tk.Listbox(listbox_frame, selectmode=tk.MULTIPLE, width=50, height=10)
+file_listbox.pack(side=tk.LEFT, padx=10)
+
+button_frame = tk.Frame(listbox_frame)
+button_frame.pack(side=tk.RIGHT, padx=10)
+
+move_up_button = tk.Button(button_frame, text="↑ Move Up", command=move_up)
+move_up_button.pack(pady=5)
+
+move_down_button = tk.Button(button_frame, text="↓ Move Down", command=move_down)
+move_down_button.pack(pady=5)
 
 add_button = tk.Button(root, text="Select PDFs", command=select_files)
 add_button.pack(pady=5)
