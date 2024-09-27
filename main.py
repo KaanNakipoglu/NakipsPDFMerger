@@ -29,19 +29,19 @@ def select_files():
     )
     if selected_paths:
         for path in selected_paths:
-            file_paths_list.append(path)  # Store the full path
-            file_listbox.insert(tk.END, os.path.basename(path))  # Show only the file name
+            file_paths_list.append(path)
+            file_listbox.insert(tk.END, os.path.basename(path))
 
 
 def merge_files():
     global file_paths_list
     selected_indices = file_listbox.curselection()
 
-    # If no files are selected, merge all files in the list
+
     if not selected_indices:
         pdfs_to_merge = file_paths_list
     else:
-        pdfs_to_merge = [file_paths_list[i] for i in selected_indices]  # Get the selected file paths
+        pdfs_to_merge = [file_paths_list[i] for i in selected_indices]
 
     if not pdfs_to_merge:
         messagebox.showerror("Error", "No PDF files selected or available.")
@@ -63,7 +63,7 @@ def remove_selected():
     selected_files = file_listbox.curselection()
     for index in reversed(selected_files):
         file_listbox.delete(index)
-        del file_paths_list[index]  # Remove the corresponding full path
+        del file_paths_list[index]
 
 
 def move_up():
@@ -73,13 +73,12 @@ def move_up():
         return
 
     for index in selected_indices:
-        if index == 0:  # If it's the first item, skip it
+        if index == 0:
             continue
         file_listbox.delete(index)
         file_listbox.insert(index - 1, os.path.basename(file_paths_list[index]))
         file_listbox.selection_set(index - 1)
 
-        # Move the corresponding path in file_paths_list
         file_paths_list[index], file_paths_list[index - 1] = file_paths_list[index - 1], file_paths_list[index]
 
 
@@ -90,13 +89,12 @@ def move_down():
         return
 
     for index in reversed(selected_indices):
-        if index == file_listbox.size() - 1:  # If it's the last item, skip it
+        if index == file_listbox.size() - 1:
             continue
         file_listbox.delete(index)
         file_listbox.insert(index + 1, os.path.basename(file_paths_list[index]))
         file_listbox.selection_set(index + 1)
 
-        # Move the corresponding path in file_paths_list
         file_paths_list[index], file_paths_list[index + 1] = file_paths_list[index + 1], file_paths_list[index]
 
 
