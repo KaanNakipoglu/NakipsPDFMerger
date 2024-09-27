@@ -1,5 +1,5 @@
 # PDFmerger
-This python program merges the pdfs you want in order you like securing your files from free websites and saves your money from paid applications
+This python program merges the pdfs you want in order you like securing your files from free websites and saves your money from paid applications PyPDF2 library is used.
 ## Steps
 <pre>
 1-)Run the program
