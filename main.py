@@ -36,11 +36,16 @@ def select_files():
 def merge_files():
     global file_paths_list
     selected_indices = file_listbox.curselection()
-    if not selected_indices:
-        messagebox.showerror("Error", "No PDF files selected.")
-        return
 
-    pdfs_to_merge = [file_paths_list[i] for i in selected_indices]  # Get the full file paths
+    # If no files are selected, merge all files in the list
+    if not selected_indices:
+        pdfs_to_merge = file_paths_list
+    else:
+        pdfs_to_merge = [file_paths_list[i] for i in selected_indices]  # Get the selected file paths
+
+    if not pdfs_to_merge:
+        messagebox.showerror("Error", "No PDF files selected or available.")
+        return
 
     output_path = filedialog.asksaveasfilename(
         defaultextension=".pdf",
