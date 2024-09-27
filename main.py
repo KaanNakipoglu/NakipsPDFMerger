@@ -4,7 +4,6 @@ import PyPDF2
 
 
 # Author: Kaan Nakipoğlu
-# Function to merge PDFs using PyPDF2
 def merge_pdfs(pdf_list, output_filename):
     pdf_merger = PyPDF2.PdfMerger()
 
